@@ -1,0 +1,51 @@
+name: Build Test Deploy Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build Application
+        run: python -m compileall app.py
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Tests
+        run: python -m unittest discover -s . -p "test_*.py"
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Deployment
+        run: echo "Application deployed successfully!"
